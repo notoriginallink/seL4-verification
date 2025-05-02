@@ -16,8 +16,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Typst
         uses: typst-community/setup-typst@v4
@@ -25,10 +27,18 @@ jobs:
           cache-dependency-path: config.typ
 
       - run: typst --version
-      - run: typst compile seL4.typ
 
-      - name: Upload PDFs as artifact
-        uses: actions/upload-artifact@v4
+      - name: Create compiled directory
+        run: mkdir -p compiled
+
+      - name: Compile Typst to PDF
+        run: typst compile seL4.typ compiled/seL4.pdf
+
+      - name: Commit and push changes
+        uses: devops-infra/action-commit-push@master
         with:
-          name: PDF
-          path: "*.pdf"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_message: "Update compiled PDF"
+          branch: main
+          files: "compiled/seL4.pdf"
+        continue-on-error: true
