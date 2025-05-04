@@ -23,3 +23,5 @@
 #let Purple(a: 100) = rgb(128, 0, 128, a)
 
 #let hint-box(body) = box(fill: Purple(a: 30), width: 100%, inset: 8pt, body)
+
+#let bib = bibliography("references.bib")
