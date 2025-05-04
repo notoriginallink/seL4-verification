@@ -185,18 +185,6 @@
   ```
 ]
 
-#slide(title: "Examples outcome")[
-  #set align(top)
-  == Lessons Learned
-  - *Modeling*: Programs are defined as mathematical functions.
-  - *Proofs*: Use induction or other logic to cover all cases.
-  - *Verification*: Isabelle ensures no mistakes in reasoning.
-  
-  == In seL4 Context
-  - Similar techniques scaled to prove complex properties (e.g., memory safety).
-  - Simple proofs build confidence for larger systems.
-]
-
 #slide(title: "Why Isabelle is chosen?")[
   #set align(top)
   #colorbox()[As mentioned before, *Isabelle/HOL* uses ITP, which is perfect for a such large project as seL4 (10k LOC). Other methods of verification would take enormous amount of time and resources.]
