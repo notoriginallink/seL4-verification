@@ -1,4 +1,7 @@
 #import "config.typ": *
+#import "isabelle_syntax.typ": isabelle
+
+#set raw(syntaxes: "Isabelle.sublime-syntax")
 
 #show: typslides.with(
   ratio: "16-9",
@@ -414,9 +417,10 @@ to an object of the expected type*_.
 #slide(title: "Effort and Outcomes")[
   
   #set align(top)
+  #set figure.caption(position: top)
   #figure(
-    image("assets/statistics_table.png"),
-    caption: "Code and proof statistics"
+    caption: "Code and proof statistics",
+    table(image("assets/statistics_table.png")),
   )
   The overall size of the proof, including framework,
 libraries, and generated proofs (not shown in the

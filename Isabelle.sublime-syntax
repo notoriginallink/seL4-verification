@@ -1,0 +1,33 @@
+%YAML 1.2
+---
+name: Isabelle
+file_extensions: [thy]
+scope: source.isabelle
+contexts:
+  main:
+    - match: \b(lemma|theorem|definition|fun|where|proof|by|using|apply|auto|simp|induct|case|next|done|have|show|fix|assume|then|from|with|obtain|type_synonym|datatype|primrec|end|Suc)\b
+      scope: keyword.control.isabelle
+    - match: '"'
+      push: string
+    - match: '\(\*'
+      push: comment_block
+    - match: '#.*$'
+      scope: comment.line.isabelle
+    - match: \b[a-zA-Z_][a-zA-Z0-9_]*\b
+      scope: variable.isabelle
+    - match: \b[0-9]+\b
+      scope: constant.numeric.isabelle
+    - match: '[⇒=+\-*/]'
+      scope: keyword.operator.isabelle
+
+  string:
+    - meta_scope: string.quoted.double.isabelle
+    - match: '\\.'
+      scope: constant.character.escape.isabelle
+    - match: '"'
+      pop: true
+
+  comment_block:
+    - meta_scope: comment.block.isabelle
+    - match: '\*\)'
+      pop: true
