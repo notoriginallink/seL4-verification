@@ -5,7 +5,7 @@ file_extensions: [thy]
 scope: source.isabelle
 contexts:
   main:
-    - match: \b(lemma|theorem|definition|fun|where|proof|by|using|apply|auto|simp|induct|case|next|done|have|show|fix|assume|then|from|with|obtain|type_synonym|datatype|primrec|end|Suc)\b
+    - match: \b(lemma|theorem|definition|fun|where|proof|by|using|apply|auto|simp|induct|case|next|done|have|show|fix|assume|then|from|with|obtain|type_synonym|datatype|primrec|end|qed|Suc)\b
       scope: keyword.control.isabelle
     - match: '"'
       push: string

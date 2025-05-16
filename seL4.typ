@@ -1,5 +1,4 @@
 #import "config.typ": *
-#import "isabelle_syntax.typ": isabelle
 
 #set raw(syntaxes: "Isabelle.sublime-syntax")
 
@@ -21,12 +20,13 @@
 
 #slide(title: "Key Features of seL4 Microkernel")[
   #set align(top)
-  *seL4*: A minimalistic #stress("open source") microkernel providing core OS services:
+  == seL4
+   A minimalistic #stress("open source") microkernel providing core OS services:
     - Process and thread management
     - Memory isolation via capabilities
     - Secure inter-process communication (IPC)
   
-  *Key Features*: 
+  == Key Features 
     - Strong isolation: Programs run in "sandboxes," preventing interference.
     - Optimized for resource-constrained devices.
     - Supports ARM, x86, RISC-V architectures.
@@ -43,7 +43,7 @@
     5. Military systems (e.g., DARPA HACMS)
     6. Internet of Things (IoT)
   
-  *Why seL4?*
+  == Why seL4?
     - Verified reliability: Guarantees no crashes or vulnerabilities.
     - Ideal for life-critical and high-security applications.
 ]
@@ -61,7 +61,6 @@
   
   #line(length: 100%)
   
-  #set align(bottom)
   #hint-box()[  
     *Common Criteria* and *DO-178C* are standards for software security and safety certification.
   ]
@@ -194,19 +193,6 @@
 ]
 
 /// MARK: - Verification Process
-#title-slide[ Verifying seL4: Process and Insights ]
-
-#slide(title: "What is Formal Verification?")[
-  #set align(top)
-  #colorbox()[
-    *Formal Verification*: Mathematically proving a system behaves correctly for *all* inputs and scenarios.
-  ]
-  
-  == Why It Matters
-  - Ensures *bug-free* behavior, unlike testing (limited cases).
-  - Critical for seL4’s use in safety-critical systems (e.g., pacemakers).
-]
-
 #title-slide("Refinement technic")
 
 #slide(title: "Refinement Layers")[
@@ -214,7 +200,7 @@
   #cols(columns: (1fr, 1fr))[
     == Approach
     - Used *Isabelle/HOL* for machine-checked proofs.
-    - Proved *functional correctness* via refinement:
+    - Proved *functional correctness* via refinement@Heiser2020TheSM:
       - Abstract spec → Executable spec → C code.
     - Prototyped in *Haskell* for design clarity.
     
@@ -238,7 +224,7 @@
   == Scheduler Specification
   The abstract specification defines *what* the scheduler does, not *how*.
   
-  ```isabelle
+  ```Isabelle
   schedule = do
     threads = all_active_tcbs;
     thread = select threads;
@@ -256,7 +242,7 @@
   == Detailed Scheduler
   The executable specification adds *how* the scheduler works.
   
-  ```isabelle
+  ```hs
   schedule = do
     action <- getSchedulerAction
     case action of
@@ -288,24 +274,7 @@
 
 ]
 
-#slide(title: "Example: C Scheduler Code")[
-    ```c
-  void setPriority(tcb_t *tptr, prio_t prio) {
-      prio_t oldprio;
-      if (thread_state_get_tcbQueued(tptr->tcbState)) {
-          ksReadyQueues[oldprio] =
-              tcbSchedDequeue(tptr, ksReadyQueues[oldprio]);
-          if (isRunnable(tptr)) {
-              ksReadyQueues[prio] =
-                  tcbSchedEnqueue(tptr, ksReadyQueues[prio]);
-          } else {
-              thread_state_ptr_set_tcbQueued(&tptr->tcbState, false);
-          }
-      }
-      tptr->tcbPriority = prio;
-  }
-  ```
-]
+
 
 #slide(title: "The proof")[
   #set align(top)
@@ -344,6 +313,30 @@ abstract one in σ′ that makes R hold between them
 again]
 ]
 
+#slide(title: "Proof chain")[
+  #figure(
+    image("assets/proof_chain.png"),
+    caption: "seL4 proof chain"
+  )
+]
+
+#slide(title: "How is C verified?")[
+  #set align(top)
+  == Refinement of C
+  C is not a formal language; in order to allow reasoning about a C program in the
+theorem prover (we use Isabelle/HOL), it has to be transformed into mathematical
+logic (HOL).
+
+ This is done by a C parser written in Isabelle. The parser defines the
+semantics of the C program, and gives it meaning in HOL according to this semantics. It is this formalisation which we prove to be a refinement of the mathematical
+(abstract) model.
+== Compiler's challenge
+As already mentioned before, some features of C were restricted to get a subset of language with unambigious semantics.
+
+#hint-box()[However, this *does not guarantee* that our
+assumed semantics for that subset is the same as the compiler’s.]
+]
+
 #slide(title: "Assurance")[
   #set align(top)
   Overall, we show that the behaviour of the C implementation is fully captured by the abstract specification. This is a strong statement, as *it allows
@@ -355,6 +348,26 @@ C program*.
 Coverage is complete. Any remaining
 implementation errors (deviations from the specifica-
 tion) can *only* occur *below the level of C*
+]
+
+#title-slide("Translation validation")
+
+#slide(title: "Reason for binaries verification")[
+  #set align(top)
+  In seL4 used GCC compiler which is itself  a large, complex program that *may have bugs*. And when speaking about security systems, bugs are not the only problem, the compiler could also contain a *trojan* that automatically builds a back door when compiling an OS.
+
+  #hint-box()[
+    To protect against defective compilers, the executable binaries that are produced by the compiler are also verified
+  ]
+
+  Specifically it is being proved, that the binary #stress[is a correct translation of the C code] (which is already proved), and thus that the binary refines the abstract specification
+]
+
+#slide(title: "Translation validation")[
+  #figure(
+    image("assets/translation_validation.png"),
+    caption: "Translation validation proof chain"
+  )
 ]
 
 #title-slide("Invariants")
@@ -428,6 +441,22 @@ table) is #stress("200,000 lines of Isabelle script").
 
   The total effort for the seL4-specific proof
   was 11 py.
+]
+
+#slide(title: "Recent Developments and Future Directions")[
+  #set align(top)
+  == Ecosystem
+  - *seL4 Foundation*: Supports open-source community and development.
+  - *seL4 Summit*: Annual event for sharing advancements.
+  
+  == Innovations
+  - *seL4 Microkit*: Framework for static system design.
+  - *Rust Support*: Safer user-level code without full verification.
+  - *Commercial Use*: NIO’s SkyOS for electric vehicles.
+  
+  == Future
+  - Enhanced hardware support (e.g., FPGAs, IOMMU).
+  - Verification of multi-core and application layers.
 ]
 
 #bibliography-slide(bib)
